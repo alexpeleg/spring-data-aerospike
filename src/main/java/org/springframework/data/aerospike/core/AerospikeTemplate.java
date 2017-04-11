@@ -221,10 +221,10 @@ public class AerospikeTemplate implements AerospikeOperations {
 		try {
 			Key key = new Key(this.namespace, domainType.getSimpleName(),
 					id.toString());
-			AerospikeData data = AerospikeData.forRead(key, null);
+
 			Record record = this.client.get(null, key);
-			data.setRecord(record);
-			return converter.read(type, data);
+
+			return mapToEntity(key, type, record);
 		}
 		catch (AerospikeException o_O) {
 			DataAccessException translatedException = exceptionTranslator
@@ -453,10 +453,10 @@ public class AerospikeTemplate implements AerospikeOperations {
 					.getPersistentEntity(type);
 			Key key = new Key(this.namespace, entity.getSetName(),
 					id.toString());
-			AerospikeData data = AerospikeData.forRead(key, null);
+
 			Record record = this.client.get(null, key);
-			data.setRecord(record);
-			return converter.read(type, data);
+
+			return mapToEntity(key, type, record);
 		}
 		catch (AerospikeException o_O) {
 			DataAccessException translatedException = exceptionTranslator
@@ -776,9 +776,7 @@ public class AerospikeTemplate implements AerospikeOperations {
 		@Override
 		public T next() {
 			KeyRecord keyRecord = this.keyRecordIterator.next();
-			AerospikeData data = AerospikeData.forRead(keyRecord.key, null);
-			data.setRecord(keyRecord.record);
-			return converter.read(type, data);
+			return mapToEntity(keyRecord.key, type, keyRecord.record);
 		}
 
 		@Override
@@ -952,6 +950,15 @@ public class AerospikeTemplate implements AerospikeOperations {
 			throw translatedException == null ? o_O : translatedException;
 		}
 		return result;
+	}
+
+	private <T> T mapToEntity(Key key, Class<T> type, Record record) {
+		if(record == null) {
+			return null;
+		}
+		AerospikeData data = AerospikeData.forRead(key, null);
+		data.setRecord(record);
+		return converter.read(type, data);
 	}
 
 }
