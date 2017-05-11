@@ -271,10 +271,6 @@ public class MappingAerospikeConverter implements AerospikeConverter, Applicatio
 
 		typeMapper.writeType(entity.getTypeInformation(), data);
 
-		if (data.getSetName() == null) {
-			data.setSetName(entity.getSetName());
-		}
-
 	}
 
 	/**
@@ -296,6 +292,7 @@ public class MappingAerospikeConverter implements AerospikeConverter, Applicatio
 		if (idProperty != null) {
 			Object id = accessor.getProperty(idProperty);
 			data.setID(id != null ? id.toString() : null);
+			data.setSetName(entity.getSetName());
 			data.addMetaDataItem(SPRING_ID_BIN, id);
 			data.addMetaDataItem(idProperty.getFieldName(), idProperty.getType());
 			bins.add(new Bin(idProperty.getFieldName(), accessor.getProperty(idProperty)));
