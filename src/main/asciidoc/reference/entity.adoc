@@ -1,0 +1,78 @@
+= Modeling Entities
+
+== Documents and Fields
+All entities should be annotated with the `@Document` annotation. Every field in the entity should be annotated with the
+`@Field` annotation. An @Id annotation also needs to be present for storing id of the entity. Best practice is to also name the property id.
+
+An overview of the annotations is provided below:
+
+* `@Document` - applied at the class level to mark class as an entity.
+* `@Id` - applied at the field level to mark the field used for identity purpose.
+* `@Field` - applied at the field level and describes the name of the field as it will be represented in the Aerospike DB BSON document thus allowing the name to be different than the fieldname of the class.
+* `@Expiration` - applied at the field level to set dynamic expiration of a document.
+* `@Version` - applied at the field level to set generation of the document that is used for CAS operations.
+
+Here is an example of the simple `Person` entity:
+
+[source,java]
+----
+import org.joda.time.DateTime;
+import org.springframework.data.aerospike.annotation.Expiration;
+import org.springframework.data.aerospike.mapping.Document;
+import org.springframework.data.aerospike.mapping.Field;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.Version;
+
+import java.util.Map;
+
+@Document(collection = "persons")
+public class Person {
+
+    @Id
+    public final String id;
+    @Field
+    public final String name;
+    @Field
+    public final int age;
+    @Field
+    public final DateTime birthday;
+    @Field
+    public final Map<String, String> meta;
+    @Expiration(unixTime = true)
+    public final DateTime expiration;
+    @Version
+    public long version;
+
+    @PersistenceConstructor
+    public Person(String id, String name, int age, DateTime birthday,
+                  Map<String, Object> meta, DateTime expiration) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.birthday = birthday;
+        this.meta = meta;
+        this.expiration = expiration;
+    }
+}
+----
+
+Expiration can be specified in two flavors: as an offset in seconds from the current time or as an absolute Unix timestamp.
+In the previous example it was set with `unixTime = true` meaning that a difference between current timestamp and `expiration`
+field will be calculated and the calculated offset will be used as an expiration value. Static expiration can also be set via
+`expiration` or `expirationExpression` properties in `@Document`.
+
+`@Document` annotation has also next useful properties: `collection`, `touchOnRead`.
+`Collection` is used for specifing in which set an entity will be saved,  as you can see from the example above -- `Person`
+entities will be saved in the Aerospike DB in the set `persons`. If you need to extend expiration of the document on read,
+set `touchOnRead` property to true.
+
+//@user_key saved as bin
+//@_class saved as bin
+
+// default data types and how they are converted + examples
+
+// custom converters
+
+// optimistic locking and version annotation
+
