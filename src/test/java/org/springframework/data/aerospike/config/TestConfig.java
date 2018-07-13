@@ -32,7 +32,7 @@ import java.util.Collections;
 @EnableAerospikeRepositories(basePackageClasses = {ContactRepository.class, CustomerRepository.class})
 @EnableCaching
 @EnableAutoConfiguration
-public class TestConfig extends AbstractAerospikeDataConfiguration  {
+public class TestConfig extends AbstractAerospikeDataConfiguration {
 
 	@Value("${embedded.aerospike.namespace}")
 	protected String namespace;
@@ -52,12 +52,12 @@ public class TestConfig extends AbstractAerospikeDataConfiguration  {
 	}
 
 	@Override
-	protected Collection<Host> getHosts() {
+	public Collection<Host> getHosts() {
 		return Collections.singleton(new Host(host, port));
 	}
 
 	@Override
-	protected String nameSpace() {
+	public String nameSpace() {
 		return namespace;
 	}
 }
