@@ -10,6 +10,7 @@ import com.aerospike.client.Record;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
+import org.awaitility.Duration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,6 +33,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
@@ -460,7 +462,7 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 
 		// truncate is async operation that is why we need to wait until
 		// it completes
-		await().atMost(TEN_SECONDS)
+		await().atMost(30, SECONDS)
 				.untilAsserted(() -> {
 					assertThat(template.findById(id1, CustomCollectionClass.class)).isNull();
 					assertThat(template.findById(id2, CustomCollectionClass.class)).isNull();
