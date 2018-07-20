@@ -453,8 +453,8 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 	public void deleteByTypeShouldDeleteAllDocumentsWithCustomSetName() throws Exception {
 		String id1 = nextId();
 		String id2 = nextId();
-		template.save(new CustomCollectionClass(id1, "field-value"));
-		template.save(new CustomCollectionClass(id2, "field-value"));
+		template.save(new CustomCollectionClass(id1, "field-value-1"));
+		template.save(new CustomCollectionClass(id2, "field-value-2"));
 
 		template.delete(SampleClasses.CustomCollectionClass.class);
 
