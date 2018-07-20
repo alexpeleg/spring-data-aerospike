@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -462,10 +464,9 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 
 		// truncate is async operation that is why we need to wait until
 		// it completes
-		await().atMost(30, SECONDS)
+		await().atMost(1, MINUTES)
 				.untilAsserted(() -> {
-					assertThat(template.findById(id1, CustomCollectionClass.class)).isNull();
-					assertThat(template.findById(id2, CustomCollectionClass.class)).isNull();
+					assertThat(template.findByIds(asList(id1, id2), CustomCollectionClass.class)).isEmpty();
 				});
 	}
 
@@ -482,8 +483,7 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 		// it completes
 		await().atMost(TEN_SECONDS)
 				.untilAsserted(() -> {
-					assertThat(template.findById(id1, DocumentWithExpiration.class)).isNull();
-					assertThat(template.findById(id2, DocumentWithExpiration.class)).isNull();
+					assertThat(template.findByIds(asList(id1, id2), DocumentWithExpiration.class)).isEmpty();
 				});
 	}
 
@@ -643,7 +643,7 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 
 		template.save(secondPerson);
 
-		List<String> ids = Arrays.asList(nextId(), firstPerson.getId(), secondPerson.getId());
+		List<String> ids = asList(nextId(), firstPerson.getId(), secondPerson.getId());
 
 		List<Person> actual = template.findByIds(ids, Person.class);
 
@@ -665,7 +665,7 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 
 		template.save(secondPerson);
 
-		Iterable<String> ids = Arrays.asList(nextId(), firstPerson.getId(), secondPerson.getId());
+		Iterable<String> ids = asList(nextId(), firstPerson.getId(), secondPerson.getId());
 
 		List<Person> actual = template.findByIDs(ids, Person.class);
 
