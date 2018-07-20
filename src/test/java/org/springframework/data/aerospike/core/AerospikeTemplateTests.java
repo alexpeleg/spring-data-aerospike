@@ -464,8 +464,9 @@ public class AerospikeTemplateTests extends BaseIntegrationTests {
 
 		// truncate is async operation that is why we need to wait until
 		// it completes
-		await().atMost(1, MINUTES)
+		await().atMost(3, MINUTES)
 				.untilAsserted(() -> {
+					assertThat(template.findAll(CustomCollectionClass.class)).isEmpty();
 					assertThat(template.findByIds(asList(id1, id2), CustomCollectionClass.class)).isEmpty();
 				});
 	}
