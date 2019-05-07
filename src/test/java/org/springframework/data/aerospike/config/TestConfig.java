@@ -4,6 +4,8 @@
 package org.springframework.data.aerospike.config;
 
 import com.aerospike.client.Host;
+import com.aerospike.client.async.EventLoops;
+import com.aerospike.client.async.NioEventLoops;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
@@ -60,4 +62,9 @@ public class TestConfig extends AbstractAerospikeDataConfiguration  {
 	protected String nameSpace() {
 		return namespace;
 	}
+
+    @Override
+    protected EventLoops eventLoops() {
+        return new NioEventLoops();
+    }
 }

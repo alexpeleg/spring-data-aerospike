@@ -2,7 +2,9 @@ package org.springframework.data.aerospike.config;
 
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Host;
+import com.aerospike.client.async.EventLoops;
 import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.reactor.AerospikeReactorClient;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -14,6 +16,7 @@ import org.springframework.data.aerospike.convert.MappingAerospikeConverter;
 import org.springframework.data.aerospike.core.AerospikeExceptionTranslator;
 import org.springframework.data.aerospike.core.AerospikeTemplate;
 import org.springframework.data.aerospike.core.DefaultAerospikeExceptionTranslator;
+import org.springframework.data.aerospike.core.ReactiveAerospikeTemplate;
 import org.springframework.data.aerospike.mapping.AerospikeMappingContext;
 import org.springframework.data.aerospike.mapping.AerospikeSimpleTypes;
 import org.springframework.data.aerospike.mapping.Document;
@@ -35,6 +38,15 @@ public abstract class AbstractAerospikeDataConfiguration {
                                                AerospikeMappingContext aerospikeMappingContext,
                                                AerospikeExceptionTranslator aerospikeExceptionTranslator) {
         return new AerospikeTemplate(aerospikeClient, nameSpace(), mappingAerospikeConverter, aerospikeMappingContext, aerospikeExceptionTranslator);
+    }
+
+    @Bean(name = "reactiveAerospikeTemplate")
+    public ReactiveAerospikeTemplate reactiveAerospikeTemplate(AerospikeClient aerospikeClient,
+                                                               MappingAerospikeConverter mappingAerospikeConverter,
+                                                               AerospikeMappingContext aerospikeMappingContext,
+                                                               AerospikeExceptionTranslator aerospikeExceptionTranslator,
+                                                               AerospikeReactorClient aerospikeReactorClient) {
+        return new ReactiveAerospikeTemplate(aerospikeClient, nameSpace(), mappingAerospikeConverter, aerospikeMappingContext, aerospikeExceptionTranslator, aerospikeReactorClient);
     }
 
     @Bean(name = "mappingAerospikeConverter")
@@ -83,6 +95,11 @@ public abstract class AbstractAerospikeDataConfiguration {
         return new AerospikeClient(getClientPolicy(), hosts.toArray(new Host[hosts.size()]));
     }
 
+    @Bean(name = "aerospikeReactorClient")
+    public AerospikeReactorClient aerospikeReactorClient(AerospikeClient aerospikeClient, EventLoops eventLoops) {
+        return new AerospikeReactorClient(aerospikeClient, eventLoops);
+    }
+
     protected Set<Class<?>> getInitialEntitySet() throws ClassNotFoundException {
         String basePackage = getMappingBasePackage();
         Set<Class<?>> initialEntitySet = new HashSet<Class<?>>();
@@ -111,10 +128,14 @@ public abstract class AbstractAerospikeDataConfiguration {
 
     protected abstract String nameSpace();
 
+    @Bean
+    protected abstract EventLoops eventLoops();
+
     protected ClientPolicy getClientPolicy() {
         ClientPolicy clientPolicy = new ClientPolicy();
         clientPolicy.failIfNotConnected = true;
         clientPolicy.timeout = 10_000;
+        clientPolicy.eventLoops = eventLoops();
         return clientPolicy;
     }
 
