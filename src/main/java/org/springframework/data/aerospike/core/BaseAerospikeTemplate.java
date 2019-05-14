@@ -1,7 +1,6 @@
 package org.springframework.data.aerospike.core;
 
 import com.aerospike.client.AerospikeClient;
-import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.GenerationPolicy;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.support.PropertyComparator;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.aerospike.convert.*;
 import org.springframework.data.aerospike.mapping.*;
 import org.springframework.data.aerospike.repository.query.Query;
@@ -145,10 +143,10 @@ abstract class BaseAerospikeTemplate {
             results = results.sorted(comparator);
         }
 
-        if(query.hasOffset()) {
+        if (query.hasOffset()) {
             results = results.skip(query.getOffset());
         }
-        if(query.hasRows()) {
+        if (query.hasRows()) {
             results = results.limit(query.getRows());
         }
         return results;
@@ -183,7 +181,7 @@ abstract class BaseAerospikeTemplate {
 
             if (Sort.Direction.DESC.equals(order.getDirection())) {
                 compoundComperator.addComparator(new PropertyComparator<>(order.getProperty(), true, false));
-            }else {
+            } else {
                 compoundComperator.addComparator(new PropertyComparator<>(order.getProperty(), true, true));
             }
         }
