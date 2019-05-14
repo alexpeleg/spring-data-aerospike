@@ -1,6 +1,7 @@
 package org.springframework.data.aerospike.core;
 
 import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.GenerationPolicy;
@@ -9,6 +10,7 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.helper.query.QueryEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.aerospike.convert.*;
 import org.springframework.data.aerospike.mapping.*;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
