@@ -8,8 +8,8 @@ import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Aerospike specific data access operations to work with reactive API
@@ -49,5 +49,7 @@ public interface ReactiveAerospikeOperations {
 
     <T> Flux<T> findInRange(long offset, long limit, Sort sort, Class<T> type);
 
+    Mono<Boolean> delete(Object id, Class<?> type);
 
+    Mono<Boolean> delete(Object objectToDelete);
 }

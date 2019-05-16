@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Tests for save related methods in {@link ReactiveAerospikeTemplate}.
+ * Tests for modification related methods in {@link ReactiveAerospikeTemplate}.
  *
  * @author Yevhen Tsyba
  */
