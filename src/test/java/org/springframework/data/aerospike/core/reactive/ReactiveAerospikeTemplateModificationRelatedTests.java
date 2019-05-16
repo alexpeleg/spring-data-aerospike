@@ -9,6 +9,7 @@ import reactor.test.StepVerifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Tests for save related methods in {@link ReactiveAerospikeTemplate}.
@@ -26,13 +27,15 @@ public class ReactiveAerospikeTemplateModificationRelatedTests extends BaseReact
 
     @Test
     public void shouldAdd() {
+        // given
         Person one = Person.builder().id(id).age(25).build();
         Mono<Person> created = reactiveTemplate.insert(one);
-
         StepVerifier.create(created).expectNext(one).verifyComplete();
 
+        // when
         Mono<Person> updated = reactiveTemplate.add(one, "age", 1);
 
+        // then
         StepVerifier.create(updated)
                 .expectNext(Person.builder().id(id).age(26).build())
                 .verifyComplete();
@@ -40,63 +43,81 @@ public class ReactiveAerospikeTemplateModificationRelatedTests extends BaseReact
 
     @Test
     public void shouldAppend() {
+        // given
         Person one = Person.builder().id(id).firstName("Nas").build();
         Mono<Person> created = reactiveTemplate.insert(one);
-
         StepVerifier.create(created).expectNext(one).verifyComplete();
 
+        // when
         Mono<Person> appended = reactiveTemplate.append(one, "firstName", "tya");
 
-        StepVerifier.create(appended)
-                .expectNext(Person.builder().id(id).firstName("Nastya").build())
-                .verifyComplete();
+        // then
+        Person expected = Person.builder().id(id).firstName("Nastya").build();
+        StepVerifier.create(appended).expectNext(expected).verifyComplete();
+
+        Mono<Optional<Person>> storedPerson = reactiveTemplate.findById(id, Person.class);
+        StepVerifier.create(storedPerson).expectNext(Optional.of(expected)).verifyComplete();
     }
 
     @Test
     public void shouldAppendMultipleFields() {
+        // given
         Person one = Person.builder().id(id).firstName("Nas").emailAddress("nastya@").build();
         Mono<Person> created = reactiveTemplate.insert(one);
-
         StepVerifier.create(created).expectNext(one).verifyComplete();
 
         Map<String, String> toBeUpdated = new HashMap<>();
         toBeUpdated.put("firstName", "tya");
         toBeUpdated.put("email", "gmail.com");
+
+        // when
         Mono<Person> appended = reactiveTemplate.append(one, toBeUpdated);
 
-        StepVerifier.create(appended)
-                .expectNext(Person.builder().id(id).firstName("Nastya").emailAddress("nastya@gmail.com").build())
-                .verifyComplete();
+        // then
+        Person expected = Person.builder().id(id).firstName("Nastya").emailAddress("nastya@gmail.com").build();
+        StepVerifier.create(appended).expectNext(expected).verifyComplete();
+
+        Mono<Optional<Person>> storedPerson = reactiveTemplate.findById(id, Person.class);
+        StepVerifier.create(storedPerson).expectNext(Optional.of(expected)).verifyComplete();
     }
 
     @Test
     public void shouldPrepend() {
+        // given
         Person one = Person.builder().id(id).firstName("tya").build();
         Mono<Person> created = reactiveTemplate.insert(one);
-
         StepVerifier.create(created).expectNext(one).verifyComplete();
 
+        // when
         Mono<Person> appended = reactiveTemplate.prepend(one, "firstName", "Nas");
 
-        StepVerifier.create(appended)
-                .expectNext(Person.builder().id(id).firstName("Nastya").build())
-                .verifyComplete();
+        // then
+        Person expected = Person.builder().id(id).firstName("Nastya").build();
+        StepVerifier.create(appended).expectNext(expected).verifyComplete();
+
+        Mono<Optional<Person>> storedPerson = reactiveTemplate.findById(id, Person.class);
+        StepVerifier.create(storedPerson).expectNext(Optional.of(expected)).verifyComplete();
     }
 
     @Test
     public void shouldPrependMultipleFields() {
+        // given
         Person one = Person.builder().id(id).firstName("tya").emailAddress("gmail.com").build();
         Mono<Person> created = reactiveTemplate.insert(one);
-
         StepVerifier.create(created).expectNext(one).verifyComplete();
 
         Map<String, String> toBeUpdated = new HashMap<>();
         toBeUpdated.put("firstName", "Nas");
         toBeUpdated.put("email", "nastya@");
+
+        // when
         Mono<Person> appended = reactiveTemplate.prepend(one, toBeUpdated);
 
-        StepVerifier.create(appended)
-                .expectNext(Person.builder().id(id).firstName("Nastya").emailAddress("nastya@gmail.com").build())
-                .verifyComplete();
+        // then
+        Person expected = Person.builder().id(id).firstName("Nastya").emailAddress("nastya@gmail.com").build();
+        StepVerifier.create(appended).expectNext(expected).verifyComplete();
+
+        Mono<Optional<Person>> storedPerson = reactiveTemplate.findById(id, Person.class);
+        StepVerifier.create(storedPerson).expectNext(Optional.of(expected)).verifyComplete();
     }
 }
